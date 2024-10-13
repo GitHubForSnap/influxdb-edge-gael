@@ -1,0 +1,53 @@
+name: influxdb-edge-gael
+version: "v0.1.0"
+base: core22
+summary: InfluxDB Edge
+description: |
+  InfluxDB Edge 
+
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+
+license: "Apache-2.0"
+
+apps:
+  influxdb3-daemon:
+    command: influxdb3_daemon.sh
+    install-mode: disable
+    daemon: simple
+    plugs:
+    - network
+    - network-bind
+
+  influxdb3:
+    command: influxdb3.sh
+    plugs:
+    - network
+    - network-bind
+
+parts:
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+
+  influxdb:
+    plugin: rust
+    build-environment:
+      - RUSTFLAGS: "-Ctarget-cpu=x86-64-v2"
+    source: https://github.com/influxdata/influxdb.git
+    source-type: git
+    rust-path:
+      - influxdb3
+    build-packages:
+      - binutils
+      - build-essential
+      - pkg-config
+      - libssl-dev
+      - clang
+      - lld
+      - git
+      - protobuf-compiler
+      - libprotobuf-dev
